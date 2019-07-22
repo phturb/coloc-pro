@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "357482851209",
+    "firebase_url": "https://colocation-pro.firebaseio.com",
+    "project_id": "colocation-pro",
+    "storage_bucket": "colocation-pro.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:357482851209:android:7790cef544a8fe9d",
+        "android_client_info": {
+          "package_name": "com.turnerapp.colocpro"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "357482851209-h7rb60f6to6lt520ipdjbj8vdr9jhbe8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCv9Oxxy5S1-mdrv73Ulg8kesA9gGgBD_k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "357482851209-h7rb60f6to6lt520ipdjbj8vdr9jhbe8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
