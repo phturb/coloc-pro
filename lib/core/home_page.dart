@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:colocpro/add_purchase_page.dart';
 import 'package:colocpro/chat/chat_room.dart';
 import 'package:colocpro/auth/base_auth.dart';
+import 'package:colocpro/purchase.dart';
+import 'package:colocpro/purchase_page.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -73,12 +76,16 @@ class _HomePageState extends State<HomePage> {
             ),
             Column(
               children: <Widget>[
-                drawerListTile(DrawerItems(Icons.shopping_basket, 'Page 1'),
-                    () => print("Page 1"), 1),
-                drawerListTile(DrawerItems(Icons.chat_bubble_outline, 'Group Chat'),
-                    () => print("Chat"), 2),
+                drawerListTile(
+                    DrawerItems(Icons.shopping_basket, 'Group Purchases'),
+                    () => print("Page 3"),
+                    3),
+                drawerListTile(
+                    DrawerItems(Icons.chat_bubble_outline, 'Group Chat'),
+                    () => print("Chat"),
+                    2),
                 drawerListTile(DrawerItems(Icons.pets, 'Page 3'),
-                    () => print("Page 3"), 3),
+                    () => print("Page 3"), 1),
                 drawerListTile(DrawerItems(Icons.stars, 'Page 4'),
                     () => print("Page 4"), 4),
                 ListTile(title: Text('SignOut'), onTap: _signOut),
@@ -94,20 +101,33 @@ class _HomePageState extends State<HomePage> {
   Widget buildPage() {
     switch (_index) {
       case 1:
-        var test = Firestore.instance.collection('acounts').document('testid').snapshots().single;
+        var test = Firestore.instance
+            .collection('acounts')
+            .document('testid')
+            .snapshots()
+            .single;
         print(test);
         return Center(child: Text(test.toString()));
       case 2:
         return ChatRoom(groupChatId: "TestGroup", userId: widget.userId);
+      case 3:
+        return PurchasePage();
       default:
-        return Center(child: Text('Page with index '+_index.toString()+' in progress...'));
+        return Center(
+            child: Text(
+                'Page with index ' + _index.toString() + ' in progress...'));
     }
   }
 
   Future<String> test() async {
-    var test = await Firestore.instance.collection('acounts').document('testid').snapshots().single;
+    var test = await Firestore.instance
+        .collection('acounts')
+        .document('testid')
+        .snapshots()
+        .single;
     return test.data.toString();
   }
+
   _signOut() async {
     try {
       await widget.auth.signOut();
