@@ -1,9 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:colocpro/add_purchase_page.dart';
 import 'package:colocpro/chat/chat_room.dart';
 import 'package:colocpro/auth/base_auth.dart';
-import 'package:colocpro/purchase.dart';
-import 'package:colocpro/purchase_page.dart';
+import 'package:colocpro/purchase_page/purchase_page.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {

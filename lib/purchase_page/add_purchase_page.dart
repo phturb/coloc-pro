@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'purchase.dart';
+import 'package:colocpro/purchase_page/purchase.dart';
 
 class AddPurchasePage extends StatefulWidget {
   @override
@@ -45,9 +45,9 @@ class AddPurchasePageState extends State<AddPurchasePage> {
     Navigator.pop(
         context,
         PurchaseItem(
-            double.parse(amountController.text),
-            nameController.text,
-            <String>['Phil', 'Steph', 'Johny'] +
+            price: double.parse(amountController.text),
+            nameOfBuyer: nameController.text,
+            listOfPersons: <String>['Phil', 'Steph', 'Johny'] +
                 <String>[nameController.text]));
   }
 }
