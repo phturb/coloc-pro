@@ -6,26 +6,25 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PurchasePage extends StatefulWidget {
-  final List<Widget> listOfPurchase = <Widget>[];
-
   @override
-  _PurchasePageState createState() => _PurchasePageState(listOfPurchase);
+  _PurchasePageState createState() => _PurchasePageState();
 }
 
 class _PurchasePageState extends State<PurchasePage> {
-  _PurchasePageState(this.listOfPurchase) {
+  _PurchasePageState() {
     _loadListOfPurchaseItem();
   }
-  List<Widget> listOfPurchase;
-  List<PurchaseItem> listOfPurchaseItem;
+  List<Widget> listOfPurchase = <Widget>[];
+  List<PurchaseItem> listOfPurchaseItem = <PurchaseItem>[];
 
   void _loadListOfPurchaseItem() {
     SharedPreferences.getInstance().then((SharedPreferences sharedUser) {
       String list = sharedUser.getString("listOfPurchaseItem");
-      final jsonDecode = json.decode(list);
       List<PurchaseItem> tempListPurchaseItem = <PurchaseItem>[];
       List<Widget> tempListWidget = <Widget>[];
-      for (dynamic jsonItem in jsonDecode) {
+      if (list == null) return;
+      final j = jsonDecode(list);
+      for (dynamic jsonItem in j) {
         final PurchaseItem item = PurchaseItem.fromJson(jsonItem);
         tempListPurchaseItem.add(item);
         tempListWidget.add(PurchaseItemWidget(item));
@@ -62,6 +61,7 @@ class _PurchasePageState extends State<PurchasePage> {
       listOfPurchase.add(PurchaseItemWidget(result));
       sharedUser.setString(
           "listOfPurchaseItem", jsonEncode(listOfPurchaseItem));
+      print(sharedUser.get("listOfPurchaseItem"));
     });
   }
 }

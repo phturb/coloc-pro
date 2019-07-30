@@ -1,14 +1,20 @@
-import 'dart:collection';
-
+import 'package:json_annotation/json_annotation.dart';
 import 'package:flutter/material.dart';
 
-class PurchaseItem {
-  double _price;
-  String nameOfBuyer;
-  Map<String, dynamic> mapOfSplitPersonsAmountDue = Map();
-  Map<String, dynamic> mapOfSplitPercentage = Map();
+part 'purchase.g.dart';
 
-  PurchaseItem({double price, this.nameOfBuyer, List<String> listOfPersons}) {
+@JsonSerializable()
+class PurchaseItem {
+  double itemPrice;
+  String nameOfBuyer;
+  Map<String, double> mapOfSplitPersonsAmountDue = Map();
+  Map<String, double> mapOfSplitPercentage = Map();
+
+  PurchaseItem(this.itemPrice, this.nameOfBuyer, this.mapOfSplitPercentage,
+      this.mapOfSplitPersonsAmountDue);
+
+  PurchaseItem.newItem(
+      {double price, this.nameOfBuyer, List<String> listOfPersons}) {
     final int numberOfPersons = listOfPersons.length;
     final double fixPercentage = 1 / numberOfPersons;
     listOfPersons
@@ -16,37 +22,23 @@ class PurchaseItem {
     this.price = price;
   }
 
-  PurchaseItem.fromJson(Map<String, dynamic> json)
-      : _price = json['price'],
-        nameOfBuyer = json['nameOfBuyer'],
-        mapOfSplitPersonsAmountDue = json['mapOfSplitPersonsAmountDue'],
-        mapOfSplitPercentage = json['mapOfSplitPercentage'];
+  factory PurchaseItem.fromJson(Map<String, dynamic> json) =>
+      _$PurchaseItemFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-        'price': _price,
-        'nameOfBuyer': nameOfBuyer,
-        'mapOfSplitPersonsAmountDue': mapOfSplitPersonsAmountDue,
-        'mapOfSplitPercentage': mapOfSplitPercentage
-      };
+  Map<String, dynamic> toJson() => _$PurchaseItemToJson(this);
 
-  static List encodeToJson(List<PurchaseItem> list) {
-    List jsonList = List();
-    list.map((item) => jsonList.add(item.toJson())).toList();
-    return jsonList;
-  }
-
-  double get price => _price;
+  double get price => itemPrice;
   set price(double p) {
-    _price = p;
-    mapOfSplitPercentage.forEach((String name, dynamic percentage) =>
-        mapOfSplitPersonsAmountDue[name] = _price * percentage);
+    itemPrice = p;
+    mapOfSplitPercentage.forEach((String name, double percentage) =>
+        mapOfSplitPersonsAmountDue[name] = itemPrice * percentage);
   }
 
   void resetPriceSplitPercentage() {
     final int numberOfPersons = mapOfSplitPercentage.length;
     final double fixPercentage = 1 / numberOfPersons;
     mapOfSplitPercentage.updateAll(
-        (String name, dynamic percentage) => percentage = fixPercentage);
+        (String name, double percentage) => percentage = fixPercentage);
   }
 }
 

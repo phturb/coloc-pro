@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:colocpro/auth/login_signup_page.dart';
 import 'package:colocpro/auth/base_auth.dart';
+import 'package:colocpro/auth/user.dart';
 import 'home_page.dart';
 
 class RootPage extends StatefulWidget {
@@ -30,7 +31,7 @@ class _RootPageState extends State<RootPage> {
       setState(() {
         if (user != null) {
           _userId = user?.uid;
-          _userEmail =user?.email;
+          _userEmail = user?.email;
         }
         authStatus =
             user?.uid == null ? AuthStatus.NOT_LOGGED_IN : AuthStatus.LOGGED_IN;
@@ -42,7 +43,7 @@ class _RootPageState extends State<RootPage> {
     widget.auth.getCurrentUser().then((user) {
       setState(() {
         _userId = user?.uid;
-        _userEmail =user?.email;
+        _userEmail = user?.email;
       });
     });
     setState(() {

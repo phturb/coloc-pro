@@ -6,10 +6,3 @@ abstract class BaseAuth {
   Future<FirebaseUser> getCurrentUser();
   Future<void> signOut();
 }
-
-class User {
-  User({this.username,this.name,this.familyName});
-  String username;
-  String name;
-  String familyName;
-}

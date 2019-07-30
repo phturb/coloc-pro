@@ -31,6 +31,7 @@ class AddPurchasePageState extends State<AddPurchasePage> {
               controller: nameController,
               decoration: InputDecoration(labelText: 'Enter your name'),
             ),
+            _createCheckBoxList(),
           ],
         ),
       ),
@@ -41,10 +42,19 @@ class AddPurchasePageState extends State<AddPurchasePage> {
     );
   }
 
+  Widget _createCheckBoxList() {
+    bool check = false;
+    return Checkbox(
+        value: check,
+        onChanged: (bool v) {
+          check = v;
+        });
+  }
+
   void _acceptInput() {
     Navigator.pop(
         context,
-        PurchaseItem(
+        PurchaseItem.newItem(
             price: double.parse(amountController.text),
             nameOfBuyer: nameController.text,
             listOfPersons: <String>['Phil', 'Steph', 'Johny'] +
