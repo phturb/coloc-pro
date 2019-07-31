@@ -1,11 +1,14 @@
 import 'dart:convert';
 
+import 'package:colocpro/group/group.dart';
 import 'package:colocpro/purchase_page/add_purchase_page.dart';
 import 'package:colocpro/purchase_page/purchase.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PurchasePage extends StatefulWidget {
+  PurchasePage(this.group);
+  final Group group;
   @override
   _PurchasePageState createState() => _PurchasePageState();
 }
@@ -52,16 +55,16 @@ class _PurchasePageState extends State<PurchasePage> {
   }
 
   Future<void> _navigateAndBringBackPurchase(BuildContext context) async {
-    final PurchaseItem result = await Navigator.of(context).push(
-        MaterialPageRoute(
-            builder: (BuildContext buildContext) => AddPurchasePage()));
-    SharedPreferences sharedUser = await SharedPreferences.getInstance();
-    setState(() {
-      listOfPurchaseItem.add(result);
-      listOfPurchase.add(PurchaseItemWidget(result));
+    final dynamic result = await Navigator.of(context).push(MaterialPageRoute(
+        builder: (BuildContext buildContext) => AddPurchasePage(widget.group)));
+    if (result != null) {
+      SharedPreferences sharedUser = await SharedPreferences.getInstance();
+      setState(() {
+        listOfPurchaseItem.add(result);
+        listOfPurchase.add(PurchaseItemWidget(result));
+      });
       sharedUser.setString(
           "listOfPurchaseItem", jsonEncode(listOfPurchaseItem));
-      print(sharedUser.get("listOfPurchaseItem"));
-    });
+    }
   }
 }
