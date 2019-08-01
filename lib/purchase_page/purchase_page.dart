@@ -30,7 +30,7 @@ class _PurchasePageState extends State<PurchasePage> {
       for (dynamic jsonItem in j) {
         final PurchaseItem item = PurchaseItem.fromJson(jsonItem);
         tempListPurchaseItem.add(item);
-        tempListWidget.add(PurchaseItemWidget(item));
+        tempListWidget.add(PurchaseItemWidget(item, _purchaseWidgetNavigate));
       }
       setState(() {
         listOfPurchaseItem = tempListPurchaseItem;
@@ -54,14 +54,30 @@ class _PurchasePageState extends State<PurchasePage> {
     );
   }
 
-  Future<void> _navigateAndBringBackPurchase(BuildContext context) async {
+  Future<void> _purchaseWidgetNavigate(
+      BuildContext context, PurchaseItem purchaseItem) async {
+    await Navigator.of(context).push(MaterialPageRoute(
+        builder: (BuildContext buildContext) => AddPurchasePage(
+              widget.group,
+              purchaseItem: purchaseItem,
+            )));
+    SharedPreferences sharedUser = await SharedPreferences.getInstance();
+    setState(() {});
+    sharedUser.setString("listOfPurchaseItem", jsonEncode(listOfPurchaseItem));
+  }
+
+  Future<void> _navigateAndBringBackPurchase(
+    BuildContext context,
+  ) async {
     final dynamic result = await Navigator.of(context).push(MaterialPageRoute(
-        builder: (BuildContext buildContext) => AddPurchasePage(widget.group)));
+        builder: (BuildContext buildContext) => AddPurchasePage(
+              widget.group,
+            )));
     if (result != null) {
       SharedPreferences sharedUser = await SharedPreferences.getInstance();
       setState(() {
         listOfPurchaseItem.add(result);
-        listOfPurchase.add(PurchaseItemWidget(result));
+        listOfPurchase.add(PurchaseItemWidget(result, _purchaseWidgetNavigate));
       });
       sharedUser.setString(
           "listOfPurchaseItem", jsonEncode(listOfPurchaseItem));

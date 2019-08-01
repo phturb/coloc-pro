@@ -54,7 +54,8 @@ class PurchaseItem {
 }
 
 class PurchaseItemWidget extends StatefulWidget {
-  PurchaseItemWidget(this.purchaseItem);
+  PurchaseItemWidget(this.purchaseItem, this.editFunction);
+  final Function editFunction;
   final PurchaseItem purchaseItem;
   @override
   _PurchaseItemWidgetState createState() =>
@@ -69,7 +70,7 @@ class _PurchaseItemWidgetState extends State<PurchaseItemWidget> {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {},
+      onDoubleTap: () => widget.editFunction(context, purchaseItem),
       child: Card(
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),

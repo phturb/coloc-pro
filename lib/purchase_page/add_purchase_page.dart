@@ -24,12 +24,16 @@ class AddPurchasePageState extends State<AddPurchasePage> {
   User currentBuyer;
   double currentPrice = 0;
 
+  void populateMapOfInvolveUser(User user) {
+    bool tempVal = false;
+    mapOfInvolveUser[user.username] = tempVal;
+  }
+
   @override
   void initState() {
     super.initState();
     if (widget.purchaseItem == null) {
-      widget.group.listOfUser
-          .forEach((User user) => mapOfInvolveUser[user.username] = true);
+      widget.group.listOfUser.forEach(populateMapOfInvolveUser);
       amountController.text = currentPrice.toStringAsFixed(2);
     } else {
       widget.group.listOfUser.forEach((User user) {
@@ -57,30 +61,29 @@ class AddPurchasePageState extends State<AddPurchasePage> {
   }
 
   List<CheckboxListTile> _getCheckBoxList() {
-    List<CheckboxListTile> list = <CheckboxListTile>[];
-    mapOfInvolveUser.forEach(
-      (String s, bool b) => list.add(
-        CheckboxListTile(
-          title: Text(s),
-          subtitle:
-              Text((currentPrice / mapOfInvolveUser.length).toStringAsFixed(2)),
-          value: b,
-          onChanged: (bool nb) {
-            mapOfInvolveUser[s] = b;
-          },
-          secondary: CircleAvatar(
-            child: Text(s[0].toUpperCase()),
-          ),
+    return mapOfInvolveUser.keys.map((String key) {
+      return CheckboxListTile(
+        title: Text(key),
+        subtitle:
+            Text((currentPrice / mapOfInvolveUser.length).toStringAsFixed(2)),
+        value: mapOfInvolveUser[key],
+        onChanged: (bool value) {
+          setState(() {
+            mapOfInvolveUser[key] = value;
+          });
+        },
+        secondary: CircleAvatar(
+          child: Text(key[0].toUpperCase()),
         ),
-      ),
-    );
-    return list;
+      );
+    }).toList();
   }
 
   void returnSaveButton(BuildContext context) {}
 
   @override
   Widget build(BuildContext context) {
+    listOfCheckboxListTile = _getCheckBoxList();
     return Scaffold(
       appBar: AppBar(
         title: Text('Purchase page'),
@@ -133,7 +136,17 @@ class AddPurchasePageState extends State<AddPurchasePage> {
                 ),
               ],
             ),
-            _createCheckBoxList(),
+            Container(
+              height: 300,
+              child: Scrollbar(
+                child: ListView.builder(
+                  itemCount: listOfCheckboxListTile.length,
+                  itemBuilder: (BuildContext buildContext, int index) {
+                    return listOfCheckboxListTile[index];
+                  },
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -190,22 +203,24 @@ class AddPurchasePageState extends State<AddPurchasePage> {
       });
   }
 
-  Widget _createCheckBoxList() {
-    return Column(
-      children: listOfCheckboxListTile,
-    );
-  }
-
   void _acceptInput() {
-    Navigator.pop(
-      context,
-      PurchaseItem.newItem(
-        nameController.text,
-        currentPrice,
-        currentBuyer,
-        selectedDate,
-        widget.group.listOfUser,
-      ),
-    );
+    if (widget.purchaseItem == null) {
+      Navigator.pop(
+        context,
+        PurchaseItem.newItem(
+          nameController.text,
+          currentPrice,
+          currentBuyer,
+          selectedDate,
+          widget.group.listOfUser,
+        ),
+      );
+    } else {
+      widget.purchaseItem.itemName = nameController.text;
+      widget.purchaseItem.price = currentPrice;
+      widget.purchaseItem.buyer = currentBuyer;
+      widget.purchaseItem.dateOfPurchase = selectedDate;
+      Navigator.pop(context);
+    }
   }
 }
