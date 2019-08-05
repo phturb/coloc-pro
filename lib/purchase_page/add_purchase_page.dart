@@ -32,21 +32,28 @@ class AddPurchasePageState extends State<AddPurchasePage> {
   @override
   void initState() {
     super.initState();
+    dropDownMenuItems = getDropDownMenuItems();
     if (widget.purchaseItem == null) {
       widget.group.listOfUser.forEach(populateMapOfInvolveUser);
       amountController.text = currentPrice.toStringAsFixed(2);
+      currentBuyer = dropDownMenuItems[0].value;
     } else {
       widget.group.listOfUser.forEach((User user) {
-        if (widget.purchaseItem.mapOfSplitPercentage[user.username] != null)
+        if (widget.purchaseItem.mapOfSplitPercentage[user.username] == null) {
+          mapOfInvolveUser[user.username] = false;
+        } else {
           mapOfInvolveUser[user.username] =
               widget.purchaseItem.mapOfSplitPercentage[user.username] != 0;
+        }
       });
+
       amountController.text = widget.purchaseItem.price.toStringAsFixed(2);
       nameController.text = widget.purchaseItem.itemName;
+      currentBuyer = widget.purchaseItem.buyer;
+      currentPrice = widget.purchaseItem.price;
+      selectedDate = widget.purchaseItem.dateOfPurchase;
     }
     listOfCheckboxListTile = _getCheckBoxList();
-    dropDownMenuItems = getDropDownMenuItems();
-    currentBuyer = dropDownMenuItems[0].value;
   }
 
   List<DropdownMenuItem<User>> getDropDownMenuItems() {
@@ -61,11 +68,18 @@ class AddPurchasePageState extends State<AddPurchasePage> {
   }
 
   List<CheckboxListTile> _getCheckBoxList() {
+    int numberOfSplitUser = 0;
+    mapOfInvolveUser.forEach((String username, bool involved) {
+      if (involved) {
+        numberOfSplitUser += 1;
+      }
+    });
     return mapOfInvolveUser.keys.map((String key) {
       return CheckboxListTile(
         title: Text(key),
-        subtitle:
-            Text((currentPrice / mapOfInvolveUser.length).toStringAsFixed(2)),
+        subtitle: numberOfSplitUser == 0 || !mapOfInvolveUser[key]
+            ? Text('0.00')
+            : Text((currentPrice / numberOfSplitUser).toStringAsFixed(2)),
         value: mapOfInvolveUser[key],
         onChanged: (bool value) {
           setState(() {
@@ -151,14 +165,27 @@ class AddPurchasePageState extends State<AddPurchasePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _acceptInput,
+        onPressed: () {
+          final List<User> purchaseUser = <User>[];
+          int numberOfInvolvedUser = 0;
+          mapOfInvolveUser.forEach((String username, bool involved) {
+            if (involved) {
+              numberOfInvolvedUser++;
+              purchaseUser.add(widget.group.mapOfMembers[username]);
+            }
+          });
+          if (numberOfInvolvedUser <= 0) {
+            return;
+          } else
+            _acceptInput(purchaseUser);
+        },
         child: Icon(Icons.save_alt),
       ),
     );
   }
 
   void updateAmountSplit(String amountString) {
-    if (amountString.isEmpty)
+    if (amountString.isEmpty || double.parse(amountString) < 0)
       currentPrice = 0;
     else
       currentPrice = double.parse(amountString);
@@ -203,7 +230,7 @@ class AddPurchasePageState extends State<AddPurchasePage> {
       });
   }
 
-  void _acceptInput() {
+  void _acceptInput(List<User> purchaseUser) {
     if (widget.purchaseItem == null) {
       Navigator.pop(
         context,
@@ -212,7 +239,7 @@ class AddPurchasePageState extends State<AddPurchasePage> {
           currentPrice,
           currentBuyer,
           selectedDate,
-          widget.group.listOfUser,
+          purchaseUser,
         ),
       );
     } else {
@@ -220,6 +247,7 @@ class AddPurchasePageState extends State<AddPurchasePage> {
       widget.purchaseItem.price = currentPrice;
       widget.purchaseItem.buyer = currentBuyer;
       widget.purchaseItem.dateOfPurchase = selectedDate;
+      widget.purchaseItem.resetMapOfSplitPercentage(purchaseUser);
       Navigator.pop(context);
     }
   }

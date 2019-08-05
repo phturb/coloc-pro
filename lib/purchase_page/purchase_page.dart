@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:colocpro/group/group.dart';
 import 'package:colocpro/purchase_page/add_purchase_page.dart';
 import 'package:colocpro/purchase_page/purchase.dart';
+import 'package:colocpro/purchase_page/purchase_item_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
