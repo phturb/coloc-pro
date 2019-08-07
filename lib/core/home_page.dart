@@ -7,6 +7,9 @@ import 'package:colocpro/auth/base_auth.dart';
 import 'package:colocpro/core/drawer_item.dart';
 import 'package:colocpro/group/group.dart';
 import 'package:colocpro/group/group_info_page.dart';
+import 'package:colocpro/group/join_group_page.dart';
+import 'package:colocpro/group/new_group_page.dart';
+import 'package:colocpro/group/no_group_page.dart';
 import 'package:colocpro/purchase_page/purchase_page.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -42,24 +45,24 @@ class _HomePageState extends State<HomePage> {
   ];
 
   Group group;
+  bool newGroup = false;
 
   String pageTitle = "Group Purchases";
 
   Future<Null> setGroup() async {
+    newGroup = false;
     SharedPreferences sharedUser = await SharedPreferences.getInstance();
-    sharedUser.clear();
     dynamic g = sharedUser.get('group');
+
     if (g == null) {
-      Group tempGroup = Group(
-          groupName: 'testGroup',
-          listOfUser: List<User>()
-            ..add(User(name: 'Phil', familyName: 'Turn', username: 'turn'))
-            ..add(User(name: 'Steph', familyName: 'Vidg', username: 'queen'))
-            ..add(User(name: 'Alpha', familyName: 'Beta', username: 'romeo')));
-      print(jsonEncode(tempGroup.toJson()));
-      sharedUser.setString('group', jsonEncode(tempGroup.toJson()));
+      // var documentReference =
+      //     Firestore.instance.collection('users').document(widget.userId);
+      // await documentReference.then((value) {
+      //   print(value.toString());
+      // });
       setState(() {
-        group = tempGroup;
+        newGroup = true;
+        //group = tempGroup;
       });
     } else {
       setState(() {
@@ -95,65 +98,119 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(pageTitle),
-      ),
-      drawer: Drawer(
-        child: ListView(
-          children: <Widget>[
-            UserAccountsDrawerHeader(
-              accountName: Text(widget.user.username),
-              accountEmail: Text(widget.userEmail),
-            ),
-            Column(
-              children: <Widget>[
-                drawerListTile(DrawerItem(Icons.shopping_basket, 'Purchases'),
-                    () => setState(() => pageTitle = "Group Purchases"), 3),
-                drawerListTile(DrawerItem(Icons.chat_bubble_outline, 'Chat'),
-                    () => setState(() => pageTitle = "Chat"), 2),
-                drawerListTile(DrawerItem(Icons.pets, 'WIP'),
-                    () => setState(() => pageTitle = "Page 3"), 1),
-                drawerListTile(DrawerItem(Icons.group, 'Group Info'),
-                    () => setState(() => pageTitle = "Group Info"), 4),
-                ListTile(title: Text('SignOut'), onTap: _signOut),
-              ],
-            ),
-          ],
+    if (newGroup == false) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(pageTitle),
         ),
-      ),
-      body: !loaded()
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
-          : buildPage(),
-    );
+        drawer: Drawer(
+          child: ListView(
+            children: <Widget>[
+              UserAccountsDrawerHeader(
+                accountName: Text(widget.user.username),
+                accountEmail: Text(widget.userEmail),
+              ),
+              Column(
+                children: <Widget>[
+                  drawerListTile(DrawerItem(Icons.shopping_basket, 'Purchases'),
+                      () => setState(() => pageTitle = "Group Purchases"), 3),
+                  drawerListTile(DrawerItem(Icons.chat_bubble_outline, 'Chat'),
+                      () => setState(() => pageTitle = "Chat"), 2),
+                  drawerListTile(DrawerItem(Icons.pets, 'WIP'),
+                      () => setState(() => pageTitle = "Page 3"), 1),
+                  drawerListTile(DrawerItem(Icons.group, 'Group Info'),
+                      () => setState(() => pageTitle = "Group Info"), 4),
+                  ListTile(title: Text('SignOut'), onTap: _signOut),
+                ],
+              ),
+            ],
+          ),
+        ),
+        body: buildPage(),
+      );
+    } else {
+      return NoGroupPage(_navigateJoinGroup, _navigateNewGroup);
+    }
+  }
+
+  Future<void> _navigateJoinGroup(BuildContext context) async {
+    Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (BuildContext context) => JoinGroupPage()))
+        .then((dynamic value) {
+      if (value != null) {
+        print('it worked');
+      }
+    });
+  }
+
+  Future<void> _newGroup(String groupName) async {
+    Group tempGroup = Group(
+        groupName: groupName,
+        listOfUser: List<String>()..add(widget.user.username));
+
+    newGroup = false;
+    var documentReference =
+        Firestore.instance.collection('groups').document(tempGroup.groupId);
+
+    Map<String, dynamic> data = tempGroup.toJson();
+    await documentReference.setData(data);
+    documentReference =
+        Firestore.instance.collection('users').document(widget.userId);
+    data = <String, dynamic>{'group': tempGroup.groupId};
+    await documentReference.setData(data, merge: true);
+    setState(() {
+      group = tempGroup;
+
+      newGroup = false;
+    });
+    SharedPreferences sharedUser = await SharedPreferences.getInstance();
+    sharedUser.setString('group', jsonEncode(group.toJson()));
+  }
+
+  Future<void> _navigateNewGroup(BuildContext context) async {
+    Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (BuildContext context) => NewGroupPage()))
+        .then((dynamic value) async {
+      if (value != null) {
+        _newGroup(value);
+      }
+    });
   }
 
   Widget buildPage() {
-    switch (_index) {
-      case 1:
-        var test = Firestore.instance
-            .collection('acounts')
-            .document('testid')
-            .snapshots()
-            .single;
-        print(test);
-        return Center(child: Text(test.toString()));
-      case 2:
-        return ChatRoom(groupChatId: "TestGroup", userId: widget.userId);
-      case 3:
-        return PurchasePage(group);
-      case 4:
-        return GroupInfoPage(group);
-      default:
-        return GroupInfoPage(group);
+    if (group != null) {
+      switch (_index) {
+        case 1:
+          var test = Firestore.instance
+              .collection('acounts')
+              .document('testid')
+              .snapshots()
+              .single;
+          print(test);
+          return Center(child: Text(test.toString()));
+        case 2:
+          return ChatRoom(groupID: group.groupId, userId: widget.userId);
+        case 3:
+          return PurchasePage(group);
+        case 4:
+          return GroupInfoPage(group);
+        default:
+          return GroupInfoPage(group);
+      }
+    } else {
+      return Center(child: CircularProgressIndicator());
     }
   }
 
   void _signOut() async {
     try {
       await widget.auth.signOut();
+      SharedPreferences sharedUser = await SharedPreferences.getInstance();
+      sharedUser.clear();
       widget.onSignedOut();
     } catch (e) {
       print(e);

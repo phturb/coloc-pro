@@ -30,7 +30,7 @@ class _PurchaseItemWidgetState extends State<PurchaseItemWidget> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   CircleAvatar(
-                    child: Text(purchaseItem.buyer.username[0].toUpperCase()),
+                    child: Text(purchaseItem.buyer[0].toUpperCase()),
                   ),
                   Container(
                     padding: EdgeInsets.only(left: 10),

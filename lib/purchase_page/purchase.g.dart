@@ -10,9 +10,7 @@ PurchaseItem _$PurchaseItemFromJson(Map<String, dynamic> json) {
   return PurchaseItem(
     json['itemName'] as String,
     (json['itemPrice'] as num)?.toDouble(),
-    json['buyer'] == null
-        ? null
-        : User.fromJson(json['buyer'] as Map<String, dynamic>),
+    json['buyer'] as String,
     json['dateOfPurchase'] == null
         ? null
         : DateTime.parse(json['dateOfPurchase'] as String),
@@ -20,6 +18,7 @@ PurchaseItem _$PurchaseItemFromJson(Map<String, dynamic> json) {
       (k, e) => MapEntry(k, (e as num)?.toDouble()),
     ),
     json['numberOfPersons'] as int,
+    json['purchaseID'] as String,
   )..price = (json['price'] as num)?.toDouble();
 }
 
@@ -28,6 +27,7 @@ Map<String, dynamic> _$PurchaseItemToJson(PurchaseItem instance) =>
       'itemName': instance.itemName,
       'itemPrice': instance.itemPrice,
       'buyer': instance.buyer,
+      'purchaseID': instance.purchaseID,
       'dateOfPurchase': instance.dateOfPurchase?.toIso8601String(),
       'mapOfSplitPercentage': instance.mapOfSplitPercentage,
       'numberOfPersons': instance.numberOfPersons,

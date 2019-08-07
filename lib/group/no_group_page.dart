@@ -1,31 +1,10 @@
-import 'package:colocpro/group/join_group_page.dart';
-import 'package:colocpro/group/new_group_page.dart';
 import 'package:flutter/material.dart';
 
 class NoGroupPage extends StatelessWidget {
-  Future<void> _navigateJoinGroup(BuildContext context) async {
-    Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (BuildContext context) => JoinGroupPage()))
-        .then((dynamic value) {
-      if (value != null) {
-        print('it worked');
-      }
-    });
-  }
+  NoGroupPage(this._navigateJoinGroup, this._navigateNewGroup);
 
-  Future<void> _navigateNewGroup(BuildContext context) async {
-    Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (BuildContext context) => NewGroupPage()))
-        .then((dynamic value) {
-      if (value != null) {
-        print('it worked');
-      }
-    });
-  }
+  final Function _navigateJoinGroup;
+  final Function _navigateNewGroup;
 
   @override
   Widget build(BuildContext context) {

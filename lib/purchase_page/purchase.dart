@@ -1,5 +1,6 @@
 import 'package:colocpro/auth/user.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:uuid/uuid.dart';
 
 part 'purchase.g.dart';
 
@@ -7,21 +8,23 @@ part 'purchase.g.dart';
 class PurchaseItem {
   String itemName;
   double itemPrice;
-  User buyer;
+  String buyer;
+  String purchaseID;
   DateTime dateOfPurchase;
   // <username, pourcentage>
   Map<String, double> mapOfSplitPercentage = Map();
   int numberOfPersons = 0;
 
   PurchaseItem(this.itemName, this.itemPrice, this.buyer, this.dateOfPurchase,
-      this.mapOfSplitPercentage, this.numberOfPersons);
+      this.mapOfSplitPercentage, this.numberOfPersons, this.purchaseID);
 
   PurchaseItem.newItem(this.itemName, double price, this.buyer,
-      this.dateOfPurchase, List<User> listOfPersons) {
+      this.dateOfPurchase, List<String> listOfPersons) {
+    purchaseID ??= Uuid().v1();
     numberOfPersons = listOfPersons.length;
     final double fixPercentage = 1 / numberOfPersons;
-    listOfPersons.forEach(
-        (User name) => mapOfSplitPercentage[name.username] = fixPercentage);
+    listOfPersons
+        .forEach((String name) => mapOfSplitPercentage[name] = fixPercentage);
     this.price = price;
   }
 
@@ -44,12 +47,12 @@ class PurchaseItem {
     itemPrice = p;
   }
 
-  void resetMapOfSplitPercentage(List<User> listOfPersons) {
+  void resetMapOfSplitPercentage(List<String> listOfPersons) {
     mapOfSplitPercentage.clear();
     numberOfPersons = listOfPersons.length;
     final double fixPercentage = 1 / numberOfPersons;
-    listOfPersons.forEach(
-        (User name) => mapOfSplitPercentage[name.username] = fixPercentage);
+    listOfPersons
+        .forEach((String name) => mapOfSplitPercentage[name] = fixPercentage);
   }
 
   void resetPriceSplitPercentage() {

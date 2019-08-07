@@ -23,6 +23,7 @@ class _RootPageState extends State<RootPage> {
   AuthStatus authStatus = AuthStatus.NOT_DETERMINED;
   String _userId = "";
   String _userEmail = "";
+  String _userDisplayName = "";
 
   @override
   void initState() {
@@ -32,6 +33,7 @@ class _RootPageState extends State<RootPage> {
         if (user != null) {
           _userId = user?.uid;
           _userEmail = user?.email;
+          _userDisplayName = user?.displayName;
         }
         authStatus =
             user?.uid == null ? AuthStatus.NOT_LOGGED_IN : AuthStatus.LOGGED_IN;
@@ -44,6 +46,7 @@ class _RootPageState extends State<RootPage> {
       setState(() {
         _userId = user?.uid;
         _userEmail = user?.email;
+        _userDisplayName = user?.displayName;
       });
     });
     setState(() {
@@ -56,6 +59,7 @@ class _RootPageState extends State<RootPage> {
       authStatus = AuthStatus.NOT_LOGGED_IN;
       _userId = "";
       _userEmail = "";
+      _userDisplayName = "";
     });
   }
 
@@ -87,7 +91,8 @@ class _RootPageState extends State<RootPage> {
             userEmail: _userEmail,
             auth: widget.auth,
             onSignedOut: _onSignedOut,
-            user: User(username: _userId, name: 'Test', familyName: 'User'),
+            user: User(
+                username: _userDisplayName, name: 'Test', familyName: 'User'),
           );
         } else
           return _buildWaitingScreen();

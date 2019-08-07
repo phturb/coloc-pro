@@ -1,4 +1,3 @@
-import 'package:colocpro/auth/user.dart';
 import 'package:colocpro/group/group.dart';
 import 'package:flutter/material.dart';
 import 'package:colocpro/purchase_page/purchase.dart';
@@ -20,13 +19,13 @@ class AddPurchasePageState extends State<AddPurchasePage> {
   DateTime selectedDate = DateTime.now();
   Map<String, bool> mapOfInvolveUser = Map<String, bool>();
   List<CheckboxListTile> listOfCheckboxListTile = <CheckboxListTile>[];
-  List<DropdownMenuItem<User>> dropDownMenuItems;
-  User currentBuyer;
+  List<DropdownMenuItem<String>> dropDownMenuItems;
+  String currentBuyer;
   double currentPrice = 0;
 
-  void populateMapOfInvolveUser(User user) {
+  void populateMapOfInvolveUser(String username) {
     bool tempVal = false;
-    mapOfInvolveUser[user.username] = tempVal;
+    mapOfInvolveUser[username] = tempVal;
   }
 
   @override
@@ -38,12 +37,12 @@ class AddPurchasePageState extends State<AddPurchasePage> {
       amountController.text = currentPrice.toStringAsFixed(2);
       currentBuyer = dropDownMenuItems[0].value;
     } else {
-      widget.group.listOfUser.forEach((User user) {
-        if (widget.purchaseItem.mapOfSplitPercentage[user.username] == null) {
-          mapOfInvolveUser[user.username] = false;
+      widget.group.listOfUser.forEach((String user) {
+        if (widget.purchaseItem.mapOfSplitPercentage[user] == null) {
+          mapOfInvolveUser[user] = false;
         } else {
-          mapOfInvolveUser[user.username] =
-              widget.purchaseItem.mapOfSplitPercentage[user.username] != 0;
+          mapOfInvolveUser[user] =
+              widget.purchaseItem.mapOfSplitPercentage[user] != 0;
         }
       });
 
@@ -56,12 +55,12 @@ class AddPurchasePageState extends State<AddPurchasePage> {
     listOfCheckboxListTile = _getCheckBoxList();
   }
 
-  List<DropdownMenuItem<User>> getDropDownMenuItems() {
-    List<DropdownMenuItem<User>> items = <DropdownMenuItem<User>>[];
-    for (User user in widget.group.listOfUser) {
+  List<DropdownMenuItem<String>> getDropDownMenuItems() {
+    List<DropdownMenuItem<String>> items = <DropdownMenuItem<String>>[];
+    for (String username in widget.group.listOfUser) {
       items.add(DropdownMenuItem(
-        value: user,
-        child: Text(user.username),
+        value: username,
+        child: Text(username),
       ));
     }
     return items;
@@ -144,7 +143,7 @@ class AddPurchasePageState extends State<AddPurchasePage> {
                 DropdownButton(
                   value: currentBuyer,
                   items: dropDownMenuItems,
-                  onChanged: (User user) => setState(() {
+                  onChanged: (String user) => setState(() {
                     currentBuyer = user;
                   }),
                 ),
@@ -166,12 +165,12 @@ class AddPurchasePageState extends State<AddPurchasePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          final List<User> purchaseUser = <User>[];
+          final List<String> purchaseUser = <String>[];
           int numberOfInvolvedUser = 0;
           mapOfInvolveUser.forEach((String username, bool involved) {
             if (involved) {
               numberOfInvolvedUser++;
-              purchaseUser.add(widget.group.mapOfMembers[username]);
+              purchaseUser.add(username);
             }
           });
           if (numberOfInvolvedUser <= 0) {
@@ -230,7 +229,7 @@ class AddPurchasePageState extends State<AddPurchasePage> {
       });
   }
 
-  void _acceptInput(List<User> purchaseUser) {
+  void _acceptInput(List<String> purchaseUser) {
     if (widget.purchaseItem == null) {
       Navigator.pop(
         context,

@@ -43,9 +43,9 @@ class _NewGroupFromState extends State<NewGroupFrom> {
                         return 'Please enter some text';
                       }
                       if (validCharacters.hasMatch(value)) {
-                        return 'Please enter a valid group name';
+                        return null;
                       }
-                      return null;
+                      return 'Please enter a valid group name';
                     },
                   ),
                 ),
@@ -55,11 +55,13 @@ class _NewGroupFromState extends State<NewGroupFrom> {
               onPressed: () {
                 if (_formKey.currentState.validate()) {
                   // If the form is valid, display a Snackbar.
-                  Scaffold.of(context)
-                      .showSnackBar(SnackBar(content: Text('Processing Data')));
+                  Scaffold.of(context).showSnackBar(SnackBar(
+                      content: Text(
+                          'Creating the ${groupNameController.text} group')));
+                  Navigator.pop(context, groupNameController.text);
                 }
               },
-              child: Text('Submit'),
+              child: Text('Create new group'),
             ),
           ],
         ),
