@@ -50,7 +50,8 @@ class Auth implements BaseAuth {
       'name': name,
       'familyName': familyName,
       'username': username,
-      'email': email
+      'email': email,
+      'groups': Map<String, String>(),
     };
     await documentReference.setData(data);
 

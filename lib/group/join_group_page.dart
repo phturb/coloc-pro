@@ -28,23 +28,47 @@ class _JoinGroupFromState extends State<JoinGroupFrom> {
     return Center(
       child: Form(
         key: _formKey,
-        child: Row(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text('Group ID :'),
-            Flexible(
-              child: TextFormField(
-                controller: groupNameController,
-                decoration: InputDecoration(labelText: 'Enter the group ID'),
-                validator: (String value) {
-                  if (value.isEmpty) {
-                    return 'Please enter some text';
-                  }
-                  if (validCharacters.hasMatch(value)) {
-                    return 'Please enter a valid group ID';
-                  }
-                  return null;
-                },
+            Container(
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+              child: Row(
+                children: <Widget>[
+                  Text('Group Name :'),
+                  Container(
+                    width: 10,
+                  ),
+                  Flexible(
+                    child: TextFormField(
+                      controller: groupNameController,
+                      decoration:
+                          InputDecoration(labelText: 'Enter the group ID'),
+                      validator: (String value) {
+                        if (value.isEmpty) {
+                          return 'Please enter some text';
+                        }
+                        // if (validCharacters.hasMatch(value)) {
+                        //   return 'Please enter a valid group ID';
+                        // }
+                        return null;
+                      },
+                    ),
+                  )
+                ],
               ),
+            ),
+            RaisedButton(
+              onPressed: () {
+                if (_formKey.currentState.validate()) {
+                  // If the form is valid, display a Snackbar.
+                  Scaffold.of(context).showSnackBar(SnackBar(
+                      content: Text(
+                          'Joining the ${groupNameController.text} group')));
+                  Navigator.pop(context, groupNameController.text);
+                }
+              },
+              child: Text('Join group'),
             ),
           ],
         ),

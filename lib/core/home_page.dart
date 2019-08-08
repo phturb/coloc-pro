@@ -51,23 +51,40 @@ class _HomePageState extends State<HomePage> {
 
   Future<Null> setGroup() async {
     newGroup = false;
-    SharedPreferences sharedUser = await SharedPreferences.getInstance();
-    dynamic g = sharedUser.get('group');
-
-    if (g == null) {
-      // var documentReference =
-      //     Firestore.instance.collection('users').document(widget.userId);
-      // await documentReference.then((value) {
-      //   print(value.toString());
-      // });
+    if (widget.user.currentGroup.isEmpty) {
       setState(() {
         newGroup = true;
-        //group = tempGroup;
       });
+      return null;
     } else {
-      setState(() {
-        group = Group.fromJson(jsonDecode(g));
+      var doc = await Firestore.instance
+          .collection('groups')
+          .document(widget.user.mapOfGroup[widget.user.currentGroup])
+          .get()
+          .catchError((e) {
+        setState(() {
+          newGroup = true;
+        });
+        return null;
       });
+      if (doc.data != null) {
+        setState(() {
+          group = Group.fromJson(doc.data);
+        });
+      } else {
+        // SharedPreferences sharedUser = await SharedPreferences.getInstance();
+        // dynamic g = sharedUser.get('group');
+
+        // if (g == null) {
+        //   setState(() {
+        //     newGroup = true;
+        //   });
+        // } else {
+        setState(() {
+          newGroup = true;
+          // group = Group.fromJson(jsonDecode(g));
+        });
+      }
     }
   }
 
@@ -133,6 +150,38 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Future<void> _joinGroup(String groupId) async {
+    var documentReference =
+        await Firestore.instance.collection('groups').document(groupId).get();
+    List<String> list = List<String>.from(documentReference.data['listOfUser']);
+    list.add(widget.user.username);
+    Map<String, dynamic> data;
+    data = {'listOfUser': list};
+    await Firestore.instance
+        .collection('groups')
+        .document(groupId)
+        .updateData(data);
+    setState(() {
+      group = Group.fromJson(documentReference.data);
+      group.listOfUser.add(widget.user.username);
+      widget.user.currentGroup = group.groupName;
+      widget.user.mapOfGroup[group.groupName] = group.groupId;
+    });
+    data = <String, dynamic>{
+      'groups': widget.user.mapOfGroup,
+      'currentGroup': widget.user.currentGroup
+    };
+    await Firestore.instance
+        .collection('users')
+        .document(widget.userId)
+        .updateData(data);
+    setState(() {
+      newGroup = false;
+    });
+    SharedPreferences sharedUser = await SharedPreferences.getInstance();
+    sharedUser.setString('group', jsonEncode(group.toJson()));
+  }
+
   Future<void> _navigateJoinGroup(BuildContext context) async {
     Navigator.push(
             context,
@@ -140,7 +189,7 @@ class _HomePageState extends State<HomePage> {
                 builder: (BuildContext context) => JoinGroupPage()))
         .then((dynamic value) {
       if (value != null) {
-        print('it worked');
+        _joinGroup(value);
       }
     });
   }
@@ -149,22 +198,29 @@ class _HomePageState extends State<HomePage> {
     Group tempGroup = Group(
         groupName: groupName,
         listOfUser: List<String>()..add(widget.user.username));
-
-    newGroup = false;
     var documentReference =
         Firestore.instance.collection('groups').document(tempGroup.groupId);
 
     Map<String, dynamic> data = tempGroup.toJson();
     await documentReference.setData(data);
-    documentReference =
-        Firestore.instance.collection('users').document(widget.userId);
-    data = <String, dynamic>{'group': tempGroup.groupId};
-    await documentReference.setData(data, merge: true);
+
+    widget.user.currentGroup = tempGroup.groupName;
+    widget.user.mapOfGroup[tempGroup.groupName] = tempGroup.groupId;
+
+    data = <String, dynamic>{
+      'groups': widget.user.mapOfGroup,
+      'currentGroup': widget.user.currentGroup
+    };
+    await Firestore.instance
+        .collection('users')
+        .document(widget.userId)
+        .updateData(data);
+
     setState(() {
       group = tempGroup;
-
       newGroup = false;
     });
+
     SharedPreferences sharedUser = await SharedPreferences.getInstance();
     sharedUser.setString('group', jsonEncode(group.toJson()));
   }

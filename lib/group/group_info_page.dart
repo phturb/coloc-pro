@@ -1,4 +1,6 @@
 import 'package:colocpro/group/group.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 class GroupInfoPage extends StatefulWidget {
@@ -13,6 +15,17 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Text(widget.group == null ? 'Temp ' : widget.group.toString());
+    return Column(
+      children: <Widget>[
+        Text(
+          widget.group == null ? 'Temp ' : widget.group.toString(),
+        ),
+        RaisedButton(
+          child: Text('Copy Group ID'),
+          onPressed: () =>
+              Clipboard.setData(new ClipboardData(text: widget.group.groupId)),
+        )
+      ],
+    );
   }
 }

@@ -13,18 +13,23 @@ class NoGroupPage extends StatelessWidget {
         title: Text('Join Group'),
       ),
       body: Center(
-          child: Column(
-        children: <Widget>[
-          RaisedButton(
-            child: Text('Join a group'),
-            onPressed: () => _navigateJoinGroup(context),
-          ),
-          RaisedButton(
-            child: Text('Create a group'),
-            onPressed: () => _navigateNewGroup(context),
-          ),
-        ],
-      )),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            RaisedButton(
+              child: Text('Join a group'),
+              onPressed: () => _navigateJoinGroup(context),
+            ),
+            Container(
+              height: 10,
+            ),
+            RaisedButton(
+              child: Text('Create a group'),
+              onPressed: () => _navigateNewGroup(context),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

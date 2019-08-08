@@ -23,31 +23,36 @@ class _RootPageState extends State<RootPage> {
   AuthStatus authStatus = AuthStatus.NOT_DETERMINED;
   String _userId = "";
   String _userEmail = "";
-  String _userDisplayName = "";
+
+  User _user;
 
   @override
   void initState() {
     super.initState();
+
     widget.auth.getCurrentUser().then((user) {
-      setState(() {
-        if (user != null) {
-          _userId = user?.uid;
-          _userEmail = user?.email;
-          _userDisplayName = user?.displayName;
-        }
-        authStatus =
-            user?.uid == null ? AuthStatus.NOT_LOGGED_IN : AuthStatus.LOGGED_IN;
+      if (user != null) {
+        _userId = user?.uid;
+        _userEmail = user?.email;
+      }
+      User.getUserFromFireBase(_userId).then((User u) {
+        setState(() {
+          _user = u;
+          authStatus = user?.uid == null
+              ? AuthStatus.NOT_LOGGED_IN
+              : AuthStatus.LOGGED_IN;
+        });
       });
     });
   }
 
-  void _onLoggedIn() {
-    widget.auth.getCurrentUser().then((user) {
+  void _onLoggedIn() async {
+    await widget.auth.getCurrentUser().then((user) async {
       setState(() {
         _userId = user?.uid;
         _userEmail = user?.email;
-        _userDisplayName = user?.displayName;
       });
+      _user = await User.getUserFromFireBase(_userId);
     });
     setState(() {
       authStatus = AuthStatus.LOGGED_IN;
@@ -59,7 +64,7 @@ class _RootPageState extends State<RootPage> {
       authStatus = AuthStatus.NOT_LOGGED_IN;
       _userId = "";
       _userEmail = "";
-      _userDisplayName = "";
+      _user = null;
     });
   }
 
@@ -91,8 +96,7 @@ class _RootPageState extends State<RootPage> {
             userEmail: _userEmail,
             auth: widget.auth,
             onSignedOut: _onSignedOut,
-            user: User(
-                username: _userDisplayName, name: 'Test', familyName: 'User'),
+            user: _user,
           );
         } else
           return _buildWaitingScreen();
