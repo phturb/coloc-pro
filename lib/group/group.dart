@@ -43,10 +43,10 @@ class Group {
     listOfUser.forEach((String user) => mapOfDeptOfUsers[user] = 0);
     if (listOfPurchaseItems.length > 0) {
       listOfPurchaseItems.forEach((PurchaseItem pi) {
-        mapOfDeptOfUsers[pi.buyer] -=
+        mapOfDeptOfUsers[pi.buyer] +=
             pi.mapOfSplitPercentage[pi.buyer] * pi.price;
         pi.mapOfSplitPercentage.forEach((String user, double percentage) {
-          if (user != pi.buyer) mapOfDeptOfUsers[user] += percentage * pi.price;
+          if (user != pi.buyer) mapOfDeptOfUsers[user] -= percentage * pi.price;
         });
       });
     }

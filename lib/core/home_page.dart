@@ -10,6 +10,7 @@ import 'package:colocpro/group/group_info_page.dart';
 import 'package:colocpro/group/join_group_page.dart';
 import 'package:colocpro/group/new_group_page.dart';
 import 'package:colocpro/group/no_group_page.dart';
+import 'package:colocpro/purchase_page/purchase.dart';
 import 'package:colocpro/purchase_page/purchase_page.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -71,6 +72,14 @@ class _HomePageState extends State<HomePage> {
         setState(() {
           group = Group.fromJson(doc.data);
         });
+        var purchaseDoc = await Firestore.instance
+            .collection('groups')
+            .document(widget.user.mapOfGroup[widget.user.currentGroup])
+            .collection('purchases')
+            .getDocuments();
+        group.listOfPurchaseItems = purchaseDoc.documents
+            .map((snapshot) => PurchaseItem.fromJson(snapshot.data))
+            .toList();
       } else {
         // SharedPreferences sharedUser = await SharedPreferences.getInstance();
         // dynamic g = sharedUser.get('group');
@@ -154,9 +163,10 @@ class _HomePageState extends State<HomePage> {
     var documentReference =
         await Firestore.instance.collection('groups').document(groupId).get();
     List<String> list = List<String>.from(documentReference.data['listOfUser']);
-    list.add(widget.user.username);
+    Set<String> tempList = list.toSet();
+    tempList.add(widget.user.username);
     Map<String, dynamic> data;
-    data = {'listOfUser': list};
+    data = {'listOfUser': tempList.toList()};
     await Firestore.instance
         .collection('groups')
         .document(groupId)

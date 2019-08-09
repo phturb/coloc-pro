@@ -140,17 +140,18 @@ class AddPurchasePageState extends State<AddPurchasePage> {
                 Padding(
                   padding: EdgeInsets.all(10),
                 ),
-                DropdownButton(
+                Flexible(
+                    child: DropdownButton(
                   value: currentBuyer,
                   items: dropDownMenuItems,
                   onChanged: (String user) => setState(() {
                     currentBuyer = user;
                   }),
-                ),
+                  isExpanded: true,
+                )),
               ],
             ),
-            Container(
-              height: 300,
+            Flexible(
               child: Scrollbar(
                 child: ListView.builder(
                   itemCount: listOfCheckboxListTile.length,

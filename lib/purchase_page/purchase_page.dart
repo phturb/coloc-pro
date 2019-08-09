@@ -51,23 +51,6 @@ class _PurchasePageState extends State<PurchasePage> {
         listOfPurchase = tempListWidget;
       });
     });
-
-    // SharedPreferences.getInstance().then((SharedPreferences sharedUser) {
-    //   String list = sharedUser.getString("listOfPurchaseItem");
-    //   List<PurchaseItem> tempListPurchaseItem = <PurchaseItem>[];
-    //   List<Widget> tempListWidget = <Widget>[];
-    //   if (list == null) return;
-    //   final j = jsonDecode(list);
-    //   for (dynamic jsonItem in j) {
-    //     final PurchaseItem item = PurchaseItem.fromJson(jsonItem);
-    //     tempListPurchaseItem.add(item);
-    //     tempListWidget.add(PurchaseItemWidget(item, _purchaseWidgetNavigate));
-    //   }
-    //   setState(() {
-    //     listOfPurchaseItem = tempListPurchaseItem;
-    //     listOfPurchase = tempListWidget;
-    //   });
-    // });
   }
 
   @override
@@ -123,6 +106,7 @@ class _PurchasePageState extends State<PurchasePage> {
 
       SharedPreferences sharedUser = await SharedPreferences.getInstance();
       setState(() {
+        widget.group.listOfPurchaseItems = listOfPurchaseItem;
         listOfPurchaseItem.add(result);
         listOfPurchase.add(PurchaseItemWidget(result, _purchaseWidgetNavigate));
       });
