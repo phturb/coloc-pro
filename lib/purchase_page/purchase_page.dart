@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:colocpro/group/group.dart';
 import 'package:colocpro/purchase_page/add_purchase_page.dart';
 import 'package:colocpro/purchase_page/purchase.dart';
@@ -15,29 +16,58 @@ class PurchasePage extends StatefulWidget {
 }
 
 class _PurchasePageState extends State<PurchasePage> {
-  _PurchasePageState() {
-    _loadListOfPurchaseItem();
-  }
   List<Widget> listOfPurchase = <Widget>[];
   List<PurchaseItem> listOfPurchaseItem = <PurchaseItem>[];
 
+  @override
+  void initState() {
+    super.initState();
+    _loadListOfPurchaseItem();
+  }
+
   void _loadListOfPurchaseItem() {
-    SharedPreferences.getInstance().then((SharedPreferences sharedUser) {
-      String list = sharedUser.getString("listOfPurchaseItem");
+    Firestore.instance
+        .collection('groups')
+        .document(widget.group.groupId)
+        .collection('purchases')
+        .getDocuments()
+        .then((snapshot) {
       List<PurchaseItem> tempListPurchaseItem = <PurchaseItem>[];
       List<Widget> tempListWidget = <Widget>[];
-      if (list == null) return;
-      final j = jsonDecode(list);
-      for (dynamic jsonItem in j) {
-        final PurchaseItem item = PurchaseItem.fromJson(jsonItem);
+      snapshot.documents.forEach((DocumentSnapshot ds) {
+        final PurchaseItem item = PurchaseItem(
+            ds.data['itemName'],
+            ds.data['itemPrice'],
+            ds.data['buyer'],
+            DateTime.parse(ds.data['dateOfPurchase']),
+            Map<String, double>.from(ds.data['mapOfSplitPercentage']),
+            ds.data['numberOfPersons'],
+            ds.data['purchaseID']);
         tempListPurchaseItem.add(item);
         tempListWidget.add(PurchaseItemWidget(item, _purchaseWidgetNavigate));
-      }
+      });
       setState(() {
         listOfPurchaseItem = tempListPurchaseItem;
         listOfPurchase = tempListWidget;
       });
     });
+
+    // SharedPreferences.getInstance().then((SharedPreferences sharedUser) {
+    //   String list = sharedUser.getString("listOfPurchaseItem");
+    //   List<PurchaseItem> tempListPurchaseItem = <PurchaseItem>[];
+    //   List<Widget> tempListWidget = <Widget>[];
+    //   if (list == null) return;
+    //   final j = jsonDecode(list);
+    //   for (dynamic jsonItem in j) {
+    //     final PurchaseItem item = PurchaseItem.fromJson(jsonItem);
+    //     tempListPurchaseItem.add(item);
+    //     tempListWidget.add(PurchaseItemWidget(item, _purchaseWidgetNavigate));
+    //   }
+    //   setState(() {
+    //     listOfPurchaseItem = tempListPurchaseItem;
+    //     listOfPurchase = tempListWidget;
+    //   });
+    // });
   }
 
   @override
@@ -64,17 +94,33 @@ class _PurchasePageState extends State<PurchasePage> {
             )));
     SharedPreferences sharedUser = await SharedPreferences.getInstance();
     setState(() {});
+    await Firestore.instance
+        .collection('groups')
+        .document(widget.group.groupId)
+        .collection('purchases')
+        .document(purchaseItem.purchaseID)
+        .setData(purchaseItem.toJson());
     sharedUser.setString("listOfPurchaseItem", jsonEncode(listOfPurchaseItem));
   }
 
   Future<void> _navigateAndBringBackPurchase(
     BuildContext context,
   ) async {
-    final dynamic result = await Navigator.of(context).push(MaterialPageRoute(
+    final PurchaseItem result = await Navigator.of(context).push(
+      MaterialPageRoute(
         builder: (BuildContext buildContext) => AddPurchasePage(
-              widget.group,
-            )));
+          widget.group,
+        ),
+      ),
+    );
     if (result != null) {
+      await Firestore.instance
+          .collection('groups')
+          .document(widget.group.groupId)
+          .collection('purchases')
+          .document(result.purchaseID)
+          .setData(result.toJson());
+
       SharedPreferences sharedUser = await SharedPreferences.getInstance();
       setState(() {
         listOfPurchaseItem.add(result);

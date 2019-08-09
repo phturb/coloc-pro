@@ -14,8 +14,8 @@ PurchaseItem _$PurchaseItemFromJson(Map<String, dynamic> json) {
     json['dateOfPurchase'] == null
         ? null
         : DateTime.parse(json['dateOfPurchase'] as String),
-    (json['mapOfSplitPercentage'] as Map<String, dynamic>)?.map(
-      (k, e) => MapEntry(k, (e as num)?.toDouble()),
+    (json['mapOfSplitPercentage'] as Map<String, double>)?.map(
+      (k, e) => MapEntry(k, e),
     ),
     json['numberOfPersons'] as int,
     json['purchaseID'] as String,

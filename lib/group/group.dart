@@ -20,12 +20,21 @@ class Group {
   String groupId;
   final String groupName;
   List<String> listOfUser;
-  @JsonKey(ignore: true)
   List<PurchaseItem> listOfPurchaseItems;
-  @JsonKey(ignore: true)
   Map<String, double> mapOfDeptOfUsers;
 
-  factory Group.fromJson(Map<String, dynamic> json) => _$GroupFromJson(json);
+  factory Group.fromJson(Map<String, dynamic> json) => Group(
+        groupName: json['groupName'] as String,
+        groupId: json['groupId'] as String,
+        listOfPurchaseItems: (json['listOfPurchaseItems'] as List)
+            ?.map((e) => e == null
+                ? null
+                : PurchaseItem.fromJson(e as Map<String, dynamic>))
+            ?.toList(),
+        mapOfDeptOfUsers: Map<String, double>.from(json['mapOfDeptOfUsers']),
+        listOfUser:
+            (json['listOfUser'] as List)?.map((e) => e as String)?.toList(),
+      );
 
   Map<String, dynamic> toJson() => _$GroupToJson(this);
 
