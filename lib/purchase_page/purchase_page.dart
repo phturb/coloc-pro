@@ -84,6 +84,9 @@ class _PurchasePageState extends State<PurchasePage> {
         .document(purchaseItem.purchaseID)
         .setData(purchaseItem.toJson());
     sharedUser.setString("listOfPurchaseItem", jsonEncode(listOfPurchaseItem));
+    setState(() {
+      widget.group.listOfPurchaseItems = listOfPurchaseItem;
+    });
   }
 
   Future<void> _navigateAndBringBackPurchase(

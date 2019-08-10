@@ -100,31 +100,6 @@ class _ChatRoomState extends State<ChatRoom> {
           children: <Widget>[
             Row(
               children: <Widget>[
-                /*
-                isLastMessageLeft(index)
-                    ? Material(
-                        child: CachedNetworkImage(
-                          placeholder: (context, url) => Container(
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 1.0,
-                                  valueColor:
-                                      AlwaysStoppedAnimation<Color>(const Color(0xfff5a623)),
-                                ),
-                                width: 35.0,
-                                height: 35.0,
-                                padding: EdgeInsets.all(10.0),
-                              ),
-                          imageUrl: peerAvatar,
-                          width: 35.0,
-                          height: 35.0,
-                          fit: BoxFit.cover,
-                        ),
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(18.0),
-                        ),
-                        clipBehavior: Clip.hardEdge,
-                      )
-                    : Container(width: 35.0),*/
                 Container(
                   child: Text(
                     document['content'],

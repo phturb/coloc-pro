@@ -8,27 +8,22 @@ class NoGroupPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Join Group'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            RaisedButton(
-              child: Text('Join a group'),
-              onPressed: () => _navigateJoinGroup(context),
-            ),
-            Container(
-              height: 10,
-            ),
-            RaisedButton(
-              child: Text('Create a group'),
-              onPressed: () => _navigateNewGroup(context),
-            ),
-          ],
-        ),
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          RaisedButton(
+            child: Text('Join a group'),
+            onPressed: () => _navigateJoinGroup(context),
+          ),
+          Container(
+            height: 10,
+          ),
+          RaisedButton(
+            child: Text('Create a group'),
+            onPressed: () => _navigateNewGroup(context),
+          ),
+        ],
       ),
     );
   }

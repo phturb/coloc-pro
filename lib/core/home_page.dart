@@ -142,8 +142,10 @@ class _HomePageState extends State<HomePage> {
                       () => setState(() => pageTitle = "Group Purchases"), 3),
                   drawerListTile(DrawerItem(Icons.chat_bubble_outline, 'Chat'),
                       () => setState(() => pageTitle = "Chat"), 2),
-                  drawerListTile(DrawerItem(Icons.pets, 'WIP'),
-                      () => setState(() => pageTitle = "Page 3"), 1),
+                  drawerListTile(
+                      DrawerItem(Icons.group_add, 'Join or Create Group'),
+                      () => setState(() => pageTitle = "Group manager"),
+                      1),
                   drawerListTile(DrawerItem(Icons.group, 'Group Info'),
                       () => setState(() => pageTitle = "Group Info"), 4),
                   ListTile(title: Text('SignOut'), onTap: _signOut),
@@ -155,7 +157,11 @@ class _HomePageState extends State<HomePage> {
         body: buildPage(),
       );
     } else {
-      return NoGroupPage(_navigateJoinGroup, _navigateNewGroup);
+      return Scaffold(
+          appBar: AppBar(
+            title: Text('Join Group'),
+          ),
+          body: NoGroupPage(_navigateJoinGroup, _navigateNewGroup));
     }
   }
 
@@ -251,13 +257,31 @@ class _HomePageState extends State<HomePage> {
     if (group != null) {
       switch (_index) {
         case 1:
-          var test = Firestore.instance
-              .collection('acounts')
-              .document('testid')
-              .snapshots()
-              .single;
-          print(test);
-          return Center(child: Text(test.toString()));
+          return Column(children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.all(10),
+                ),
+                Text('Change group :'),
+                Padding(
+                  padding: EdgeInsets.all(10),
+                ),
+                Flexible(
+                    child: DropdownButton(
+                  value: widget.user.currentGroup,
+                  items: getDropDownMenuItems(),
+                  onChanged: (String groupName) => setState(() {
+                    widget.user.currentGroup = groupName;
+                    setGroup();
+                  }),
+                  isExpanded: true,
+                )),
+              ],
+            ),
+            Flexible(child: NoGroupPage(_navigateJoinGroup, _navigateNewGroup))
+          ]);
         case 2:
           return ChatRoom(groupID: group.groupId, userId: widget.userId);
         case 3:
@@ -270,6 +294,17 @@ class _HomePageState extends State<HomePage> {
     } else {
       return Center(child: CircularProgressIndicator());
     }
+  }
+
+  List<DropdownMenuItem<String>> getDropDownMenuItems() {
+    List<DropdownMenuItem<String>> items = <DropdownMenuItem<String>>[];
+    widget.user.mapOfGroup.forEach((String groupName, String groupId) {
+      items.add(DropdownMenuItem(
+        value: groupName,
+        child: Text(groupName),
+      ));
+    });
+    return items;
   }
 
   void _signOut() async {

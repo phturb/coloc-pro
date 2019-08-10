@@ -1,3 +1,4 @@
+import 'package:colocpro/graph/graph.dart';
 import 'package:colocpro/group/group.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -18,9 +19,18 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
     widget.group.calculateDept();
     return Column(
       children: <Widget>[
-        Text(
-          widget.group.groupName,
-          style: TextStyle(fontSize: 30),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: <Widget>[
+            Text(
+              widget.group.groupName,
+              style: TextStyle(fontSize: 30),
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: GraphWidget(widget.group.mapOfDeptOfUsers),
+            ),
+          ],
         ),
         Flexible(
           child: ListView.builder(
@@ -39,16 +49,12 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
           child: Text('Copy Group ID'),
           onPressed: () =>
               Clipboard.setData(new ClipboardData(text: widget.group.groupId)),
-        )
+        ),
       ],
     );
   }
 
   void dept() {
     widget.group.calculateDept();
-    String deptString = '';
-    widget.group.mapOfDeptOfUsers.forEach((String name, double dept) {
-      deptString += name + ' ' + dept.toStringAsFixed(2) + '\n';
-    });
   }
 }
