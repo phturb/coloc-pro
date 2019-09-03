@@ -3,19 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ChatRoom extends StatefulWidget {
-  ChatRoom({Key key, @required this.groupChatId, @required this.userId}) : super(key: key);
-  final String groupChatId;
+  ChatRoom({Key key, @required this.groupID, @required this.userId})
+      : super(key: key);
+  final String groupID;
   final String userId;
 
   @override
-  _ChatRoomState createState() => _ChatRoomState(groupChatId, userId);
+  _ChatRoomState createState() => _ChatRoomState(groupID, userId);
 }
 
 class _ChatRoomState extends State<ChatRoom> {
-  _ChatRoomState(this.groupChatId,this.id);
+  _ChatRoomState(this.groupID, this.id);
   final String id;
   SharedPreferences sharedPrefs;
-  final String groupChatId;
+  final String groupID;
   bool isLoading;
   final TextEditingController textEditingController =
       new TextEditingController();
@@ -52,9 +53,9 @@ class _ChatRoomState extends State<ChatRoom> {
       textEditingController.clear();
 
       var documentReference = Firestore.instance
+          .collection('groups')
+          .document(groupID)
           .collection('messages')
-          .document(groupChatId)
-          .collection(groupChatId)
           .document(DateTime.now().millisecondsSinceEpoch.toString());
 
       Firestore.instance.runTransaction((transaction) async {
@@ -62,7 +63,7 @@ class _ChatRoomState extends State<ChatRoom> {
           documentReference,
           {
             'idFrom': id,
-            'idGroupChat': groupChatId,
+            'idGroupChat': groupID,
             'timestamp': DateTime.now().millisecondsSinceEpoch.toString(),
             'content': content,
           },
@@ -99,31 +100,6 @@ class _ChatRoomState extends State<ChatRoom> {
           children: <Widget>[
             Row(
               children: <Widget>[
-                /*
-                isLastMessageLeft(index)
-                    ? Material(
-                        child: CachedNetworkImage(
-                          placeholder: (context, url) => Container(
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 1.0,
-                                  valueColor:
-                                      AlwaysStoppedAnimation<Color>(const Color(0xfff5a623)),
-                                ),
-                                width: 35.0,
-                                height: 35.0,
-                                padding: EdgeInsets.all(10.0),
-                              ),
-                          imageUrl: peerAvatar,
-                          width: 35.0,
-                          height: 35.0,
-                          fit: BoxFit.cover,
-                        ),
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(18.0),
-                        ),
-                        clipBehavior: Clip.hardEdge,
-                      )
-                    : Container(width: 35.0),*/
                 Container(
                   child: Text(
                     document['content'],
@@ -265,16 +241,16 @@ class _ChatRoomState extends State<ChatRoom> {
 
   Widget buildListMessage() {
     return Flexible(
-      child: groupChatId == ''
+      child: groupID == ''
           ? Center(
               child: CircularProgressIndicator(
                   valueColor:
                       AlwaysStoppedAnimation<Color>(const Color(0xfff5a623))))
           : StreamBuilder(
               stream: Firestore.instance
+                  .collection('groups')
+                  .document(groupID)
                   .collection('messages')
-                  .document(groupChatId)
-                  .collection(groupChatId)
                   .orderBy('timestamp')
                   .snapshots(),
               builder: (BuildContext context,

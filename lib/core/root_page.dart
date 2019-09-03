@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:colocpro/auth/login_signup_page.dart';
 import 'package:colocpro/auth/base_auth.dart';
+import 'package:colocpro/auth/user.dart';
 import 'home_page.dart';
 
 class RootPage extends StatefulWidget {
@@ -23,27 +24,35 @@ class _RootPageState extends State<RootPage> {
   String _userId = "";
   String _userEmail = "";
 
+  User _user;
+
   @override
   void initState() {
     super.initState();
+
     widget.auth.getCurrentUser().then((user) {
-      setState(() {
-        if (user != null) {
-          _userId = user?.uid;
-          _userEmail =user?.email;
-        }
-        authStatus =
-            user?.uid == null ? AuthStatus.NOT_LOGGED_IN : AuthStatus.LOGGED_IN;
+      if (user != null) {
+        _userId = user?.uid;
+        _userEmail = user?.email;
+      }
+      User.getUserFromFireBase(_userId).then((User u) {
+        setState(() {
+          _user = u;
+          authStatus = user?.uid == null
+              ? AuthStatus.NOT_LOGGED_IN
+              : AuthStatus.LOGGED_IN;
+        });
       });
     });
   }
 
-  void _onLoggedIn() {
-    widget.auth.getCurrentUser().then((user) {
+  void _onLoggedIn() async {
+    await widget.auth.getCurrentUser().then((user) async {
       setState(() {
         _userId = user?.uid;
-        _userEmail =user?.email;
+        _userEmail = user?.email;
       });
+      _user = await User.getUserFromFireBase(_userId);
     });
     setState(() {
       authStatus = AuthStatus.LOGGED_IN;
@@ -55,6 +64,7 @@ class _RootPageState extends State<RootPage> {
       authStatus = AuthStatus.NOT_LOGGED_IN;
       _userId = "";
       _userEmail = "";
+      _user = null;
     });
   }
 
@@ -86,7 +96,7 @@ class _RootPageState extends State<RootPage> {
             userEmail: _userEmail,
             auth: widget.auth,
             onSignedOut: _onSignedOut,
-            user: User(username: _userId, name: 'Test', familyName: 'User'),
+            user: _user,
           );
         } else
           return _buildWaitingScreen();
